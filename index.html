@@ -1,0 +1,226 @@
+<!doctype html>
+
+<head>
+	
+	<title>The Principle of TooMuchMagic</title>
+	
+	<link href='http://fonts.googleapis.com/css?family=Roboto+Condensed' rel='stylesheet' type='text/css'>
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+	
+	<style>
+		body {
+			margin: 0;
+			padding: 0;
+			font-family: 'Open Sans', sans-serif;
+			font-size: 1.1em;
+			line-height: 1.75em;
+			color: #333;
+		}
+		h1, h2, h3 {
+			font-family: 'Roboto Condensed', sans-serif;
+		}
+		
+		#container {
+			margin: 0 auto;
+			max-width: 700px;
+			min-width: 400px;
+			padding: 0 2em;
+		}
+		
+		footer {
+			margin-top: 10em;
+			border-top: solid 1px #CCC;
+			padding-top: 1em;
+		}
+			footer p {
+				margin-top: 0;
+			}
+			footer p:nth-child(1) {
+				margin-bottom: 0;
+			}
+		header {
+			margin: 5em 0;
+		}
+			header h1 {
+				font-size: 2.5em;
+				margin: 0;
+			}
+			
+		article {
+		}
+			article h2, article h3 {
+				margin-left: -20px;
+			}
+			article h2 {
+				font-size: 1.5em;
+			}
+			article h3 {
+				font-size: 1em;
+			}
+			article ul {
+				padding-left: 0;
+			}
+		
+		footer {
+			font-size: 0.75em;
+			line-height: 1.5em;
+		}
+		
+		.permalink {
+			float: left;
+			width: 20px;
+			visibility: hidden;
+			color: #333;
+			text-decoration: none;
+		}
+			.permalink:hover {
+				text-decoration: underline;
+			}
+		article h2:hover .permalink, article h3:hover .permalink {
+			visibility: visible;
+		}
+	</style>
+</head>
+
+<body>
+<div id="container">
+
+<header>
+	<h1>The Principle of TooMuchMagic</h1>
+</header>
+
+<article>
+	<h2><a class="permalink" href="#introduction">#</a> Introduction</h2>
+
+	<p>Programmers are, generally, smart people. Also, generally, they try to solve the general problem rather than the specific one. This leads to the holy grail: reusable software. Not reusable in the sense that you can store it on a hard drive and type a new letter with it the next day, but reusable in the sense that their software will be generally usable in a broad scope of software products. This will, generally, mean that there is less code for them to write in subsequent software projects. Since programmers are generally very lazy, this is generally considered a good thing.</p>
+	<p>Generally, the complex minds of smart programmers result in complex solutions. Also, generally, complex solutions will be slower than simple counterparts, will be more prone to containing bugs, will be more difficult to debug, more difficult to maintain, more difficult to explain, and more difficult to learn. Which are, generally, bad things.</p>
+	<p>(You may have noticed my slight overuse of the word "general" in the above two paragraphs. Do not worry: that's intentional, and typical of the programming style this article ridicules. Other "magic words" to be aware of include "dynamic", "pluggable", "runtime", "bytecode", "scriptable", "fully configurable" and more).</p>
+
+	<h2><a class="permalink" href="#required-reading">#</a> Required reading</h2>
+
+	<p>This paper assumes you are a smart Java programmer with lots of knowledge about smart Java features. If you are not a Java programmer, but very smart anyway, it may still make some sense to you, or it may not. Let me know.</p>
+
+	<h2><a class="permalink" href="#magic-defined">#</a> Magic defined</h2>
+
+	<p>"Magic" is what wizards use to make really impressive (to lesser minds, seemingly impossible) things happen, often automatically and transparently, sometimes distributed, and usually without asking about it first.</p>
+	<p>"Magic" is anything that makes a piece of software miraculously do things that otherwise seemed impossible (or at least very difficult).</p>
+	<p>"Magic" is inherently vague, and difficult to define precisely. What we can do is show examples.</p>
+
+	<h2><a class="permalink" href="#several-tricks">#</a> Several magic tricks</h2>
+
+	<p>Let us enumerate several magic tricks in common use throughout the java world.</p>
+
+	<h3><a class="permalink" href="#reflection">#</a> Reflection</h3>
+	<p>Anything that uses java.lang.Class and the associated java.lang.reflect package. While a simple this.getClass().getName() may not be very shocking, the consistent use of reflection for decoupling classes and applications can result in mindboggling complexity. The use of reflection is often unavoidable in ugly beasts such as "generic application frameworks"; reflection is what allows them to be generic.</p>
+
+	<h3><a class="permalink" href="#dynamic-proxying">#</a> Dynamic proxying</h3>
+	<p>In common use ever since jdk 1.3 started providing built-in support (but before that available through bytecode engineering) dynamic proxying is a true black art. Using dynamic proxies, one can replace an instance with just about anything else. This allows for all kinds of dynamic features, like pluggable, runtime-configurable, xml-policy-based instrumentation, component hot-swapping, and a whole lot more. It also makes it utterly impossible to be sure the instance you're currently holding, is, in fact, an instance. It results in quite significant overhead (ranging from a factor of 10 to a factor of 10000000 depending on what kind of magic stuff your dynamic proxy does for you), looks quite ugly in a debugger, and can be used to implement all kinds of other magic.</p>
+
+	<h3><a class="permalink" href="#bytecode-engineering">#</a> Bytecode engineering</h3>
+	<p>Libraries such as BCEL and CGLIB can be used to read and write java classfiles directly. That's great fun of course, as we can circumvent or rewrite many of the java language rules (ugly things like access modifiers really are no sweat when you're doing bytecode hacking). Combined with smart classloaders, we can even defer all this rewriting until runtime.</p>
+
+	<h3><a class="permalink" href="#smart-classloaders">#</a> Smart classloaders</h3>
+	<p>Let's face it, classloaders are the nightmare of the java world, analogous to the DLL hell of the windows world. It has taken many smart programmers many years and five product redesigns to get classloading inside Jakarta Tomcat figured out. And all Tomcat does is run servlets. Anything more generic than Tomcat has a classloader architecture that's even more difficult to get right.</p>
+	<p>One way to circumvent all those issues is by linearly transforming them into something else, by providing custom classloaders. Classloaders that aggregate, that reload classes, that support bytecode engineering and modification, that have special provisions for dynamic download and upgrading of support libraries...I've seen them all. Combine a few of them together and it becomes utterly impossible to tell what version of what classfiles from what locations on what disks are linked to one another. Version mismatches are almost guaranteed!</p>
+
+	<h3><a class="permalink" href="#aspect-oriented">#</a> Aspect-Oriented Programming</h3>
+	<p>Aspect-Oriented Programming, AOP for short, is not magic in and of itself. Its (part of) a programming methodology. Unfortunately, java doesn't have AOP support. It is easily added though, provided one uses enough wizardry. AOP can be implemented using interceptors, dynamic proxying, and similar features (ie, Nanning), using byte code engineering (ie, AspectWerkz), using a precompiler (commonly done for instrumentation purposes, ie clover) or even using a language extension and appropriate compiler (ie, AspectJ).</p>
+
+	<h3><a class="permalink" href="#attributes">#</a> Attributes</h3>
+	<p>An idea that gathered steam by being a core feature of the .Net platform, Attributes are a way for associating arbitrary data (like text strings or even arbitrary java objects) with arbitrary parts of a classfile (like the class itself, some field, or the fifth argument to the method of the base class).</p>
+	<p>Of course, java doesn't have built-in support for attributes either. It does have javadoc tags, which can and are abused to model attributes. Libraries for doing so include XDoclet, QDox, jakarta-commons-attributes, and others. Of course, each library does it not just a little, but often quite differently.</p>
+	<p>But how do we get the javadoc tags into a place you can do something with it? Well, we'll have to add a compiler, a storage format and a runtime reflection-style support library. In some applications, multiple attribute libraries are used, so that means multiple compilers, metadata files, and runtime libraries as well.</p>
+	<p>Attributes are all the rage today, especially when combined with AOP, some form of xml and some kind of smart containment framework.</p>
+
+	<h3><a class="permalink" href="#pseudo-languages">#</a> Pseudo-programming languages</h3>
+	<p>Of course, the use of proxies, AOP, attributes, and more, may not be enough to satisfy our dynamic needs. In that case, we can always design our own pseudo-language that does the things we cannot figure out how to do in java. Common examples include xml-based configuration tools (like the XML version of Jelly or XMLBeans) and so-called declarative-style programming (ie, Avalon-Merlin).</p>
+
+	<h3><a class="permalink" href="#scripting-languages">#</a> Scripting languages</h3>
+	<p>As an alternative to a special-purpose language, one also has the option of using a generic scripting language. These are often interpreted at runtime, most always lack strong typing or access checks, and have at least as many pecularities as java itself. Furthermore, their java-based implementations always seem to lag behind their native counterparts. Examples of popular java-enabled scripting languages include Jython, BeanShell, Groovy, and more.</p>
+
+	<h3><a class="permalink" href="#frameworks">#</a> Frameworks</h3>
+	<p>Surging on after adding metadata and scriptable configuration, we can move away from 'basic' java and start using some kind of framework. These frameworks usually require some application restructuring to get into position, and then slowly saturate every one of your classes until it is no longer usable without the framework. What is often seen as a big advantage to these frameworks is that they include a whole lot of magic for you to use "out of the box", in a "uniform, general way". Popular frameworks include J2EE, WebWork, Eclipse Platform, Avalon, HiveMind, Spring, and others.</p>
+
+	<h3><a class="permalink" href="#other-tricks">#</a> Others</h3>
+	<p>There are many other kinds of magic besides those listed here. If you know of an especially good example, you're encouraged to add it.</p>
+
+	<h2><a class="permalink" href="#the-principle">#</a> The Principle Of Too Much Magic</h2>
+
+	<p>Many programmers have a tendency to be Too Smart. Being Smart, they introduce various kinds of Magic into their software. This will usually lead to a software design that is more generic, dynamic and flexible than is needed, has more features than is needed, and is hence much more complex than is needed.</p>
+	
+	<h3><a class="permalink" href="#also-known-as">#</a> Also known as&hellip;</h3>
+	<ul>
+		<li>flexibility syndrome</li>
+		<li>design ahead of need</li>
+		<li>YFTKISS (You Failed To Keep It Simple, Stupid!)</li>
+		<li>EOJSTO (Establishment Of Job Security Through Obscurity)</li>
+	</ul>
+	
+	<h3><a class="permalink" href="#you-know">#</a> You know you've used too much magic if&hellip;</h3>
+	<ul>
+		<li>&hellip;you are no longer certain what will happen when you start your application</li>
+		<li>&hellip;you have to check the framework docs to find out exactly what the framework will do and what your code should do in return</li>
+		<li>&hellip;someone asks you how all this magic you've built works and you can't answer</li>
+		<li>&hellip;your callstack won't fit in your debug window</li>
+		<li>&hellip;your stack traces won't fit on a single A4</li>
+		<li>&hellip;your application uses all known forms of magic</li>
+		<li>&hellip;you are using a framework inside a framework inside a framework</li>
+		<li>&hellip;you are embedding a scripting language inside metadata tags which are transformed into xml scripts which are loaded through a custom classloader which is provided to you by a framework inside a framework inside a framework</li>
+		<li>&hellip;your xml configuration file looks like a Microsoft Office document</li>
+		<li>&hellip;your xml configuration DTD is the size of the XHTML specification</li>
+		<li>&hellip;your xml configuration schema is not expressible using a DTD</li>
+		<li>&hellip;your collegues call you Neo</li>
+		<li>&hellip;your collegues call you Harry Potter</li>
+		<li>&hellip;your wife calls you Harry Potter</li>
+		<li>&hellip;your servlet requires 400MB of RAM</li>
+		<li>&hellip;you have done dynamic proxying around the reflection library to simplify the access to the runtime metadata library from your scripting language</li>
+		<li>&hellip;you need to use AOP to write your unit tests</li>
+		<li>&hellip;you need to RTFM to write your unit tests</li>
+		<li>&hellip;your collegues cannot read your unit tests</li>
+		<li>&hellip;you cannot read your unit tests</li>
+		<li>&hellip;it is no longer possible to remove the magic from your application</li>
+		<li>&hellip;your code reads and feels like Perl</li>
+		<li>&hellip;your code is written in Perl</li>
+		<li>&hellip;your IDE doesn't know how to color-code your code</li>
+		<li>&hellip;the refactoring tools of your IDE no longer work with your code</li>
+		<li>&hellip;you use multiple AOP libraries</li>
+		<li>&hellip;you use multiple scripting languages</li>
+		<li>&hellip;your documentation is as utterly unreadable as the EJB specification</li>
+		<li>&hellip;sysadmins require certification before they can admin your system</li>
+		<li>&hellip;your local jar repository looks like an Apache-ftp-mirror after running your app loading missing jars automatically</li>
+		<li>&hellip;your generated source code won't compile, because it exceeds the 64 KByte size limit for Java class files</li>
+		<li>&hellip;you have to increase the VM's memory size three times before your application finally starts</li>
+		<li>&hellip;you are using XML DOM's as a datatype instead of a hashmap/collections.</li>
+		<li>&hellip;you are passing XML fragments(or DOM's) between classes and functions instead of java objects.</li>
+	</ul>
+	
+	<h3><a class="permalink" href="#how-to-avoid">#</a> How to avoid the use of magic</h3>
+	<p>The only way to really avoid magic is to be constantly on-guard against it. But here's some tips anyway:
+	<ul>
+		<li>Whenever you feel tempted to import java.lang.reflect.Method, take a coffee break, rethink your problem, write a unit test, and find out how to do without reflection.</li>
+		<li>Whenever you consider using some kind of framework, look for one that has little impact on 80% of your code.</li>
+		<li>Make sure 80% of your code is magic-free.</li>
+		<li>Run your code through your debugger regularly.</li>
+		<li>Refactor.</li>
+		<li>Pair program, or at least get peer review. See if your collegues can explain your code to you after looking at it for 5 minutes.</li>
+		<li>Refactor.</li>
+	</ul>
+	
+	<h3><a class="permalink" href="#tips-for-magicians">#</a> Tips for Magicians</h3>
+	<p>Of course, if you absolutely have to add some magic:</p>
+	<p>...a little magic goes a long way</p>
+	
+	<h2><a class="permalink" href="#summary">#</a> Summary</h2>
+
+	<p>Programmers are smart. We can think of many smart things. We have a tendency to overuse smart things, making software too complex. We really shouldn't.</p>
+</article>
+
+<footer>
+	<p>Originally published at <a href="http://lsd.student.utwente.nl/jicarilla/TooMuchMagic">http://lsd.student.utwente.nl/jicarilla/TooMuchMagic</a> and copied from the <a href="http://web.archive.org/web/20041208162103/http://lsd.student.utwente.nl/jicarilla/TooMuchMagic">Internet Archive</a>.</p>
+	<p>This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/deed.en_US">Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License</a>. <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/deed.en_US"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-nc-sa/3.0/80x15.png" /></a></p>
+</footer>
+
+</div>
+</body>
+
+</html>
